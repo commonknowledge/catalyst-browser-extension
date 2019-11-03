@@ -1,0 +1,41 @@
+{
+  "name": "catalyst-browser-extension",
+  "version": "1.0.0",
+  "description": "Making social struggles visible on the internet",
+  "manifest_version": 2,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "catalyst-browser-extension@commonknowledge.coop",
+      "strict_min_version": "42.0"
+    }
+  },
+  "background": {
+    "scripts": [
+      "js/eventPage.js"
+    ],
+    "persistent": true
+  },
+  "page_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png"
+  },
+  "permissions": [
+    "tabs"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.google.com/*",
+        "*://*.google.co.uk/*"
+      ],
+      "js": [
+        "js/contentScript.js"
+      ]
+    }
+  ]
+}

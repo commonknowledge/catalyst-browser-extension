@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "~/dev/catalyst-browser-extension"
+    }
+  ],
+  "settings": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  }
+}

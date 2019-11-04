@@ -1,7 +1,5 @@
 import * as React from "react";
 import { ThemeProvider } from "theme-ui";
-import { Global, css } from "@emotion/core";
-import { Fragment } from "react";
 import "@csstools/normalize.css";
 
 export const theme: any = {
@@ -47,26 +45,7 @@ export const theme: any = {
 };
 
 export const Theme: React.FC = ({ children }) => (
-  <Fragment>
-    <ThemeProvider theme={theme}>
-      <Global
-        styles={css`
-          html,
-          body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-            background: ${theme.colors.background};
-            font-family: ${theme.fonts.body};
-            font-size: ${theme.fontSizes[3]}px;
-          }
-          ::selection {
-            background: ${theme.colors.text};
-            color: #ffffff;
-          }
-        `}
-      />
-      {children}
-    </ThemeProvider>
-  </Fragment>
+  <ThemeProvider theme={theme}>
+    {children}
+  </ThemeProvider>
 );

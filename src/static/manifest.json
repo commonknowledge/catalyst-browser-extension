@@ -11,7 +11,7 @@
   },
   "background": {
     "scripts": [
-      "js/eventPage.js"
+      "js/background.js"
     ],
     "persistent": true
   },
@@ -25,7 +25,10 @@
     "16": "icon.png"
   },
   "permissions": [
-    "tabs"
+    "tabs",
+    "storage",
+    "unlimitedStorage",
+    "http://localhost:5000/*"
   ],
   "content_scripts": [
     {
@@ -34,7 +37,7 @@
         "*://*.google.co.uk/*"
       ],
       "js": [
-        "js/contentScript.js"
+        "js/content.js"
       ]
     }
   ]

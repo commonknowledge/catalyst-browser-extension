@@ -17,3 +17,9 @@ export const Checkbox: React.FC<{
     </label>
   </div>
 );
+
+export const Banner: React.FC = ({ children }) => (
+  <div sx={{ border: '2px solid red', color: 'red.4', p: 3 }}>
+    {children}
+  </div>
+)

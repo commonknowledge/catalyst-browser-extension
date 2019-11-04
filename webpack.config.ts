@@ -12,8 +12,8 @@ const webpackConfig: webpack.Configuration = {
   entry: {
     manifest: project.src("static/manifest.json"),
     "js/popup": project.src("js/popup/index.tsx"),
-    "js/eventPage": project.src("js/eventPage/index.ts"),
-    "js/contentScript": project.src("js/contentScript/index.ts")
+    "js/background": project.src("js/background/index.ts"),
+    "js/content": project.src("js/content/index.ts")
   },
   resolveLoader: {
     // Required for manifest-loader

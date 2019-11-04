@@ -10,15 +10,49 @@ import {
 import { createAddressBanner } from "./banner";
 import { getCurrentDisputes, getDisputeAddresses } from "../common/data";
 
+const find = (address: Catalyst.Address): Range[] => {
+  if (address.addressType === "website") {
+    const url = new URL(address.address);
+    const searchStr =
+      url.hostname + (url.pathname.length > 1 ? url.pathname : "");
+    return rangeLookup(searchStr);
+  } else if (address.addressType === "location") {
+    const [name, ...addr] = address.address.split(",");
+    const ranges = rangeLookup(address.address);
+    const nameRanges = rangeLookup(name);
+    const addrRanges = rangeLookup(addr.join(","));
+    return ranges.length || (nameRanges.length && addrRanges)
+      ? ranges.concat(nameRanges.concat(addrRanges))
+      : [];
+  } else {
+    return [];
+  }
+};
+
 const pause = (ms: number = 1000) =>
   new Promise(resolve => setTimeout(() => resolve(), ms));
 
+let currentUrl = window.location.toString();
+
 (async () => {
+  run();
+  while (true) {
+    await pause(1000);
+    const url2 = window.location.toString();
+    if (currentUrl !== url2) {
+      currentUrl = window.location.toString();
+      run();
+    }
+  }
+})();
+
+async function run() {
+  console.log("Scanning page");
+
   const currentDisputes = await getCurrentDisputes();
   const disputeAddresses = getDisputeAddresses(currentDisputes);
 
-  const url = window.location.toString();
-
+  const url = currentUrl;
   if (isTwitter(url)) {
     console.log("TWITTER");
   } else if (isFacebook(url)) {
@@ -29,7 +63,8 @@ const pause = (ms: number = 1000) =>
     console.log("LINKEDIN");
   } else if (isGoogleMaps(url)) {
     let el;
-    while (el === null || el === undefined) {
+    while (!el) {
+      if (url !== currentUrl) return;
       console.log("test", el);
       await pause(1000);
       el = document.querySelector(".section-info-hoverable");
@@ -90,23 +125,4 @@ const pause = (ms: number = 1000) =>
       createAddressBanner(address, node);
     });
   }
-})();
-
-const find = (address: Catalyst.Address): Range[] => {
-  if (address.addressType === "website") {
-    const url = new URL(address.address);
-    const searchStr =
-      url.hostname + (url.pathname.length > 1 ? url.pathname : "");
-    return rangeLookup(searchStr);
-  } else if (address.addressType === "location") {
-    const [name, ...addr] = address.address.split(",");
-    const ranges = rangeLookup(address.address);
-    const nameRanges = rangeLookup(name);
-    const addrRanges = rangeLookup(addr.join(","));
-    return ranges.length || (nameRanges.length && addrRanges)
-      ? ranges.concat(nameRanges.concat(addrRanges))
-      : [];
-  } else {
-    return [];
-  }
-};
+}

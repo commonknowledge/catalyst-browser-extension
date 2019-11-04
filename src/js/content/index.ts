@@ -10,6 +10,9 @@ import {
 import { createAddressBanner } from "./banner";
 import { getCurrentDisputes, getDisputeAddresses } from "../common/data";
 
+const pause = (ms: number = 1000) =>
+  new Promise(resolve => setTimeout(() => resolve(), ms));
+
 (async () => {
   const currentDisputes = await getCurrentDisputes();
   const disputeAddresses = getDisputeAddresses(currentDisputes);
@@ -25,7 +28,40 @@ import { getCurrentDisputes, getDisputeAddresses } from "../common/data";
   } else if (isLinkedin(url)) {
     console.log("LINKEDIN");
   } else if (isGoogleMaps(url)) {
-    console.log("GOOGLEMAPS");
+    let el;
+    while (el === null || el === undefined) {
+      console.log("test", el);
+      await pause(1000);
+      el = document.querySelector(".section-info-hoverable");
+    }
+    console.log("done", el);
+
+    const banners: {
+      range: Range;
+      address: { address: Catalyst.Address; dispute: Catalyst.Dispute };
+    }[] = [];
+
+    // Find
+    const locations = disputeAddresses.filter(a => {
+      return a.address.addressType === "location";
+    });
+
+    locations.forEach(address => {
+      const ranges = find(address.address);
+      if (ranges.length === 0) return;
+      banners.push({
+        address,
+        range: ranges[0]
+      });
+    });
+
+    if (!banners.length) return;
+
+    // Label it
+    if (!el) return;
+    const node = el.cloneNode();
+    el.append(node);
+    createAddressBanner(banners[0].address, node);
   } else if (isGoogleSearch(url)) {
     console.log("GOOGLESEARCH");
 
@@ -61,9 +97,16 @@ const find = (address: Catalyst.Address): Range[] => {
     const url = new URL(address.address);
     const searchStr =
       url.hostname + (url.pathname.length > 1 ? url.pathname : "");
-    const res = rangeLookup(searchStr);
-    console.log("Searching for ", searchStr, res);
-    return res;
+    return rangeLookup(searchStr);
+  } else if (address.addressType === "location") {
+    const [name, ...addr] = address.address.split(",");
+    const ranges = rangeLookup(address.address);
+    const nameRanges = rangeLookup(name);
+    const addrRanges = rangeLookup(addr.join(","));
+    return ranges.length || (nameRanges.length && addrRanges)
+      ? ranges.concat(nameRanges.concat(addrRanges))
+      : [];
+  } else {
+    return [];
   }
-  return [];
 };
